@@ -96,6 +96,13 @@ This project uses Claude Code with custom configuration for AI-assisted developm
 |--------|---------|
 | `@modelcontextprotocol/server-filesystem` | Read/write project files directly |
 | `@modelcontextprotocol/server-memory` | Persist context across Claude sessions |
+| `@upstash/context7-mcp` | Fetch live docs for libraries/frameworks |
+
+### Skills (`.claude/skills/`)
+
+| Skill | Trigger | What it does |
+|-------|---------|--------------|
+| `context7-mcp` | Asking about libraries, frameworks, API references | Fetches current documentation via Context7 for Vue, Firebase, Tailwind, etc. instead of relying on training data. Uses `resolve-library-id` → `query-docs` workflow. |
 
 ### Custom Slash Commands (`.claude/commands/`)
 

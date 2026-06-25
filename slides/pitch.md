@@ -37,9 +37,9 @@ Me — a student who juggles assignments, errands, and deadlines every day but s
 <!-- slide 4 -->
 # How I built it
 
-- **MCP**: `filesystem` + `memory` — direct file access and persistent context across sessions
+- **MCP**: `filesystem` + `memory` + `context7` — file access, persistent context, live library docs
+- **Skill**: `context7-mcp` — fetches current docs for Vue 3, Firebase, Tailwind instead of stale training data
 - **Skill**: `/plan-day` — AI-generated prioritized schedule for today's tasks
-- **Skill**: `/design` — automated frontend design audit for consistency and responsiveness
 - **Agent**: `productivity-coach` — reviews UX gaps, bugs, and improvement opportunities
 
 ---
