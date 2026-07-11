@@ -4,9 +4,9 @@ A personal productivity app built with Vue 3 and Firebase. Plan your day, manage
 
 ## Preview
 
-![Login](asset/login.png)
-![Today View](asset/today.png)
-![Calendar View](asset/calendar.png)
+![Login](screenshots/login.png)
+![Today View](screenshots/today.png)
+![Calendar View](screenshots/calendar.png)
 
 ## Features
 
@@ -18,16 +18,16 @@ A personal productivity app built with Vue 3 and Firebase. Plan your day, manage
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
+| Layer     | Technology                                 |
+| --------- | ------------------------------------------ |
 | Framework | Vue 3 (Composition API + `<script setup>`) |
-| Language | TypeScript |
-| Styling | Tailwind CSS v4 |
-| Icons | Lucide Vue |
-| Router | Vue Router v5 |
-| Backend | Firebase (Auth, Firestore, Hosting) |
-| Build | Vite |
-| Testing | Vitest + Vue Test Utils |
+| Language  | TypeScript                                 |
+| Styling   | Tailwind CSS v4                            |
+| Icons     | Lucide Vue                                 |
+| Router    | Vue Router v5                              |
+| Backend   | Firebase (Auth, Firestore, Hosting)        |
+| Build     | Vite                                       |
+| Testing   | Vitest + Vue Test Utils                    |
 
 ## Project Structure
 
@@ -92,30 +92,30 @@ This project uses Claude Code with custom configuration for AI-assisted developm
 
 ### MCP Servers (`.mcp.json`)
 
-| Server | Purpose |
-|--------|---------|
-| `@modelcontextprotocol/server-filesystem` | Read/write project files directly |
-| `@modelcontextprotocol/server-memory` | Persist context across Claude sessions |
-| `@upstash/context7-mcp` | Fetch live docs for libraries/frameworks |
+| Server                                    | Purpose                                  |
+| ----------------------------------------- | ---------------------------------------- |
+| `@modelcontextprotocol/server-filesystem` | Read/write project files directly        |
+| `@modelcontextprotocol/server-memory`     | Persist context across Claude sessions   |
+| `@upstash/context7-mcp`                   | Fetch live docs for libraries/frameworks |
 
 ### Skills (`.claude/skills/`)
 
-| Skill | Trigger | What it does |
-|-------|---------|--------------|
+| Skill          | Trigger                                            | What it does                                                                                                                                                         |
+| -------------- | -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `context7-mcp` | Asking about libraries, frameworks, API references | Fetches current documentation via Context7 for Vue, Firebase, Tailwind, etc. instead of relying on training data. Uses `resolve-library-id` → `query-docs` workflow. |
 
 ### Custom Slash Commands (`.claude/commands/`)
 
-| Command | Description |
-|---------|-------------|
-| `/plan-day` | Suggests a prioritized schedule for today's tasks |
-| `/add-task <description>` | Parse natural language task input and guide adding it to the app |
-| `/design [area]` | Frontend design audit — checks consistency, responsiveness, dark mode, accessibility, and applies top fixes |
+| Command                   | Description                                                                                                 |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `/plan-day`               | Suggests a prioritized schedule for today's tasks                                                           |
+| `/add-task <description>` | Parse natural language task input and guide adding it to the app                                            |
+| `/design [area]`          | Frontend design audit — checks consistency, responsiveness, dark mode, accessibility, and applies top fixes |
 
 ### Sub-Agent (`.claude/agents/`)
 
-| Agent | Trigger | What it does |
-|-------|---------|--------------|
+| Agent                | Trigger                                                                    | What it does                                                                                                                                     |
+| -------------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `productivity-coach` | "how can I improve the app", "what features should I add", "review the UX" | Reviews components and composables for UX gaps, bugs, and productivity improvements. Outputs severity-tagged findings with file:line references. |
 
 ## Firestore Data Model
