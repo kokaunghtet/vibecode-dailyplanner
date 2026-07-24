@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import DayCell from './DayCell.vue'
 import type { CalendarDay } from '../utils/calendar'
+import { usePreferences } from '../composables/usePreferences'
 
 const props = defineProps<{
   monthGrid: CalendarDay[]
@@ -11,7 +13,12 @@ const emit = defineEmits<{
   select: [date: string]
 }>()
 
-const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+const { weekStart } = usePreferences()
+
+const dayHeaders = computed(() => {
+  const sunFirst = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+  return weekStart.value === 'mon' ? [...sunFirst.slice(1), sunFirst[0]] : sunFirst
+})
 </script>
 
 <template>

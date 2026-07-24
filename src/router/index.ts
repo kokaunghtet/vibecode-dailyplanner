@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuth, authReady } from '../composables/useAuth'
+import { landingRouteName } from '../composables/usePreferences'
 
 const routes = [
   {
@@ -45,7 +46,7 @@ router.beforeEach(async (to) => {
   }
 
   if (requiresGuest && user.value) {
-    return { name: 'Today' }
+    return { name: landingRouteName() }
   }
 })
 

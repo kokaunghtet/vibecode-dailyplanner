@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth } from '../composables/useAuth'
+import { landingRouteName } from '../composables/usePreferences'
 import { Eye, EyeOff } from '@lucide/vue'
 
 const router = useRouter()
@@ -31,7 +32,7 @@ async function handleSubmit() {
   try {
     if (mode.value === 'login') {
       await login(email.value, password.value)
-      await router.push({ name: 'Today' })
+      await router.push({ name: landingRouteName() })
     } else if (mode.value === 'register') {
       if (password.value !== confirmPassword.value) {
         error.value = 'Passwords do not match'
@@ -42,7 +43,7 @@ async function handleSubmit() {
         return
       }
       await register(email.value, password.value)
-      await router.push({ name: 'Today' })
+      await router.push({ name: landingRouteName() })
     } else if (mode.value === 'forgot') {
       await resetPassword(email.value)
       success.value = 'Check your email for a password reset link'

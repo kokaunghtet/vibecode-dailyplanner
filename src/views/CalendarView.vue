@@ -3,13 +3,16 @@ import { ref, computed } from 'vue'
 import CalendarGrid from '../components/CalendarGrid.vue'
 import TodoPanel from '../components/TodoPanel.vue'
 import { getMonthGrid, formatDate } from '../utils/calendar'
+import { usePreferences } from '../composables/usePreferences'
+
+const { weekStart } = usePreferences()
 
 const today = new Date()
 const currentYear = ref(today.getFullYear())
 const currentMonth = ref(today.getMonth())
 const selectedDate = ref(formatDate(today))
 
-const monthGrid = computed(() => getMonthGrid(currentYear.value, currentMonth.value))
+const monthGrid = computed(() => getMonthGrid(currentYear.value, currentMonth.value, weekStart.value))
 
 const monthLabel = computed(() => {
   const date = new Date(currentYear.value, currentMonth.value, 1)

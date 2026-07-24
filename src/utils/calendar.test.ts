@@ -89,4 +89,12 @@ describe('getMonthGrid', () => {
     const jan1 = grid.find(d => d.isCurrentMonth && d.day === 1)
     expect(jan1!.date).toBe('2026-01-01')
   })
+
+  it('starts with Monday when weekStart is "mon"', () => {
+    const grid = getMonthGrid(2026, 5, 'mon') // June 2026 starts on Monday
+    // First cell should be June 1 itself (no padding needed)
+    expect(grid[0].isCurrentMonth).toBe(true)
+    expect(grid[0].day).toBe(1)
+    expect(grid[0].date).toBe('2026-06-01')
+  })
 })

@@ -3,12 +3,14 @@ import { watch, onUnmounted, ref } from 'vue'
 import TodoItem from './TodoItem.vue'
 import { useTodos } from '../composables/useTodos'
 import { formatDisplayDate } from '../utils/calendar'
+import { usePreferences } from '../composables/usePreferences'
 import { Sparkles, Loader2, Plus } from '@lucide/vue'
 
 const props = defineProps<{
   selectedDate: string
 }>()
 
+const { dateFormat } = usePreferences()
 const { todos, loading, subscribeToDate, addTodo, toggleTodo, updateTodoText, deleteTodo, cleanup } = useTodos()
 
 const newTodoText = ref('')
@@ -37,7 +39,7 @@ async function handleAddTodo() {
   <div class="flex flex-col h-full">
     <!-- Header -->
     <h2 class="text-base font-semibold text-gray-900 dark:text-white mb-4">
-      {{ formatDisplayDate(props.selectedDate) }}
+      {{ formatDisplayDate(props.selectedDate, dateFormat) }}
     </h2>
 
     <!-- Add todo input -->

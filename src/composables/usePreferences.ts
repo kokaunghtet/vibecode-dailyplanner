@@ -21,3 +21,9 @@ watch(dateFormat, (v) => localStorage.setItem('pref_dateFormat', v))
 export function usePreferences() {
   return { weekStart, landingView, dateFormat }
 }
+
+// Route name for the user's preferred landing view; used by the login flow
+// and the guest-route redirect so both stay in sync with the preference.
+export function landingRouteName(): 'Today' | 'Calendar' {
+  return landingView.value === 'calendar' ? 'Calendar' : 'Today'
+}

@@ -12,15 +12,16 @@ export function formatDate(date: Date): string {
   return `${y}-${m}-${d}`
 }
 
-export function formatDisplayDate(dateStr: string): string {
+export function formatDisplayDate(dateStr: string, locale = 'en-US'): string {
   const date = new Date(dateStr + 'T00:00:00')
-  return date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
+  return date.toLocaleDateString(locale, { weekday: 'long', month: 'long', day: 'numeric' })
 }
 
-export function getMonthGrid(year: number, month: number): CalendarDay[] {
+export function getMonthGrid(year: number, month: number, weekStart: 'sun' | 'mon' = 'sun'): CalendarDay[] {
+  const weekStartIndex = weekStart === 'mon' ? 1 : 0
   const firstDay = new Date(year, month, 1)
   const lastDay = new Date(year, month + 1, 0)
-  const startDayOfWeek = firstDay.getDay() // 0=Sun, 6=Sat
+  const startDayOfWeek = (firstDay.getDay() - weekStartIndex + 7) % 7 // days to pad before month start
   const daysInMonth = lastDay.getDate()
 
   const today = new Date()
