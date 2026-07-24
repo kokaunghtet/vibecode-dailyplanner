@@ -15,7 +15,7 @@ const emit = defineEmits<{
 <template>
   <button
     type="button"
-    class="flex items-center justify-center w-full aspect-square min-h-[40px] min-w-[40px] rounded-full text-sm transition-colors cursor-pointer"
+    class="flex items-center justify-center w-full aspect-square min-h-[40px] min-w-[40px] rounded-lg text-sm transition-colors cursor-pointer"
     :class="[
       isSelected
         ? 'bg-blue-600 text-white'
