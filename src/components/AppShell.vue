@@ -72,32 +72,33 @@ async function handleLogout() {
             <div class="relative" ref="userMenuRef">
               <button
                 @click="toggleUserMenu"
-                class="flex items-center justify-center w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                class="flex items-center justify-center w-9 h-9 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
               >
                 <User :size="18" />
               </button>
 
               <div
                 v-if="userMenuOpen"
-                class="absolute right-0 mt-2 w-40 rounded-md bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-10"
+                class="absolute right-0 mt-2 w-40 rounded-md bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-10 overflow-hidden"
               >
                 <button
                   @click="closeUserMenu"
-                  class="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  class="w-full flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                 >
                   <User :size="16" />
                   Profile
                 </button>
                 <button
                   @click="closeUserMenu"
-                  class="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  class="w-full flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                 >
                   <Settings :size="16" />
                   Settings
                 </button>
+                <div class="my-1 border-t border-gray-200 dark:border-gray-700" />
                 <button
                   @click="handleLogout"
-                  class="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  class="w-full flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                 >
                   <LogOut :size="16" />
                   Logout
@@ -124,16 +125,16 @@ async function handleLogout() {
       <div class="flex justify-around py-2">
         <router-link
           to="/"
-          class="flex flex-col items-center px-3 py-1 text-gray-600 dark:text-gray-400"
-          exact-active-class="!text-blue-600 dark:!text-blue-400"
+          class="flex flex-col items-center px-3 py-1 rounded-md text-gray-600 dark:text-gray-400"
+          exact-active-class="!text-blue-600 dark:!text-blue-400 bg-blue-50 dark:bg-blue-900/20"
         >
           <Home :size="20" />
           <span class="text-xs mt-0.5">Today</span>
         </router-link>
         <router-link
           to="/calendar"
-          class="flex flex-col items-center px-3 py-1 text-gray-600 dark:text-gray-400"
-          exact-active-class="!text-blue-600 dark:!text-blue-400"
+          class="flex flex-col items-center px-3 py-1 rounded-md text-gray-600 dark:text-gray-400"
+          exact-active-class="!text-blue-600 dark:!text-blue-400 bg-blue-50 dark:bg-blue-900/20"
         >
           <Calendar :size="20" />
           <span class="text-xs mt-0.5">Calendar</span>
