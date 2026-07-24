@@ -23,7 +23,7 @@ A personal productivity app built with Vue 3 and Firebase. Plan your day, manage
 | Framework | Vue 3 (Composition API + `<script setup>`) |
 | Language  | TypeScript                                 |
 | Styling   | Tailwind CSS v4                            |
-| Icons     | Lucide Vue                                 |
+| Icons     | Lucide Vue (`@lucide/vue`)                 |
 | Router    | Vue Router v5                              |
 | Backend   | Firebase (Auth, Firestore, Hosting)        |
 | Build     | Vite                                       |
