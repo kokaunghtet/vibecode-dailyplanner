@@ -1,14 +1,36 @@
 <script setup lang="ts">
+import { ref, onMounted, onUnmounted } from 'vue'
 import ThemeToggle from './ThemeToggle.vue'
 import NotificationPrompt from './NotificationPrompt.vue'
 import { useRouter } from 'vue-router'
 import { useAuth } from '../composables/useAuth'
-import { Home, Calendar, LogOut } from '@lucide/vue'
+import { Home, Calendar, LogOut, User, Settings } from '@lucide/vue'
 
 const router = useRouter()
-const { user, logout } = useAuth()
+const { logout } = useAuth()
+
+const userMenuOpen = ref(false)
+const userMenuRef = ref<HTMLElement | null>(null)
+
+function toggleUserMenu() {
+  userMenuOpen.value = !userMenuOpen.value
+}
+
+function closeUserMenu() {
+  userMenuOpen.value = false
+}
+
+function handleClickOutside(event: MouseEvent) {
+  if (userMenuRef.value && !userMenuRef.value.contains(event.target as Node)) {
+    closeUserMenu()
+  }
+}
+
+onMounted(() => document.addEventListener('click', handleClickOutside))
+onUnmounted(() => document.removeEventListener('click', handleClickOutside))
 
 async function handleLogout() {
+  closeUserMenu()
   await logout()
   await router.push({ name: 'Login' })
 }
@@ -45,17 +67,43 @@ async function handleLogout() {
 
           <!-- Right side: theme + user -->
           <div class="flex items-center space-x-4">
-            <span class="text-sm text-gray-500 dark:text-gray-400 hidden sm:inline">
-              {{ user?.email }}
-            </span>
             <ThemeToggle />
-            <button
-              @click="handleLogout"
-              class="inline-flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
-            >
-              <LogOut :size="16" />
-              <span class="hidden sm:inline">Logout</span>
-            </button>
+
+            <div class="relative" ref="userMenuRef">
+              <button
+                @click="toggleUserMenu"
+                class="flex items-center justify-center w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+              >
+                <User :size="18" />
+              </button>
+
+              <div
+                v-if="userMenuOpen"
+                class="absolute right-0 mt-2 w-40 rounded-md bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-10"
+              >
+                <button
+                  @click="closeUserMenu"
+                  class="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                >
+                  <User :size="16" />
+                  Profile
+                </button>
+                <button
+                  @click="closeUserMenu"
+                  class="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                >
+                  <Settings :size="16" />
+                  Settings
+                </button>
+                <button
+                  @click="handleLogout"
+                  class="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
+                >
+                  <LogOut :size="16" />
+                  Logout
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
