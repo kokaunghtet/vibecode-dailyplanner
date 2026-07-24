@@ -23,6 +23,16 @@ const routes = [
         path: 'calendar',
         name: 'Calendar',
         component: () => import('../views/CalendarView.vue')
+      },
+      {
+        path: 'profile',
+        name: 'Profile',
+        component: () => import('../views/ProfileView.vue')
+      },
+      {
+        path: 'settings',
+        name: 'Settings',
+        component: () => import('../views/SettingsView.vue')
       }
     ]
   }

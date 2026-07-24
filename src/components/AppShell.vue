@@ -20,6 +20,16 @@ function closeUserMenu() {
   userMenuOpen.value = false
 }
 
+function goToProfile() {
+  closeUserMenu()
+  router.push({ name: 'Profile' })
+}
+
+function goToSettings() {
+  closeUserMenu()
+  router.push({ name: 'Settings' })
+}
+
 function handleClickOutside(event: MouseEvent) {
   if (userMenuRef.value && !userMenuRef.value.contains(event.target as Node)) {
     closeUserMenu()
@@ -82,14 +92,14 @@ async function handleLogout() {
                 class="absolute right-0 mt-2 w-40 rounded-md bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-10 overflow-hidden"
               >
                 <button
-                  @click="closeUserMenu"
+                  @click="goToProfile"
                   class="w-full flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                 >
                   <User :size="16" />
                   Profile
                 </button>
                 <button
-                  @click="closeUserMenu"
+                  @click="goToSettings"
                   class="w-full flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                 >
                   <Settings :size="16" />
