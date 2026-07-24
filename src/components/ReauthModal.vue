@@ -64,7 +64,7 @@ function handleCancel() {
           </div>
         </div>
 
-        <slot name="error" />
+        <slot name="extra" />
 
         <div class="flex items-center gap-3">
           <button
