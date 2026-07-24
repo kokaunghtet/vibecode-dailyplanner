@@ -7,6 +7,7 @@ import {
   addDoc,
   updateDoc,
   deleteDoc,
+  getDocs,
   doc,
   serverTimestamp,
 } from 'firebase/firestore'
@@ -97,6 +98,14 @@ export function useTodos() {
     await deleteDoc(todoRef)
   }
 
+  async function getAllTodos(): Promise<Todo[]> {
+    await authReady
+    if (!user.value) return []
+    const todosRef = collection(db, 'users', user.value.uid, 'todos')
+    const snapshot = await getDocs(todosRef)
+    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as Todo)
+  }
+
   function cleanup() {
     if (unsubscribe) {
       unsubscribe()
@@ -108,5 +117,5 @@ export function useTodos() {
     loading.value = false
   }
 
-  return { todos, loading, subscribeToDate, addTodo, toggleTodo, updateTodoText, deleteTodo, cleanup }
+  return { todos, loading, subscribeToDate, addTodo, toggleTodo, updateTodoText, deleteTodo, getAllTodos, cleanup }
 }

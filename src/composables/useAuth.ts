@@ -5,6 +5,11 @@ import {
   signOut,
   onAuthStateChanged,
   sendPasswordResetEmail,
+  updateProfile,
+  updatePassword,
+  deleteUser,
+  reauthenticateWithCredential,
+  EmailAuthProvider,
   type User
 } from 'firebase/auth'
 import { auth } from '../firebase'
@@ -41,7 +46,44 @@ export function useAuth() {
     await sendPasswordResetEmail(auth, email)
   }
 
-  return { user, loading, register, login, logout, resetPassword }
+  async function updateDisplayName(name: string) {
+    if (!auth.currentUser) throw new Error('Not authenticated')
+    await updateProfile(auth.currentUser, { displayName: name })
+    // updateProfile mutates auth.currentUser in place but doesn't trigger
+    // onAuthStateChanged, so refresh the local ref to reflect the change.
+    user.value = auth.currentUser
+  }
+
+  async function reauth(currentPassword: string) {
+    if (!auth.currentUser?.email) throw new Error('Not authenticated')
+    const credential = EmailAuthProvider.credential(auth.currentUser.email, currentPassword)
+    await reauthenticateWithCredential(auth.currentUser, credential)
+  }
+
+  async function changePassword(currentPassword: string, newPassword: string) {
+    if (!auth.currentUser) throw new Error('Not authenticated')
+    await reauth(currentPassword)
+    await updatePassword(auth.currentUser, newPassword)
+  }
+
+  async function deleteAccount(currentPassword: string) {
+    if (!auth.currentUser) throw new Error('Not authenticated')
+    await reauth(currentPassword)
+    await deleteUser(auth.currentUser)
+  }
+
+  return {
+    user,
+    loading,
+    register,
+    login,
+    logout,
+    resetPassword,
+    updateDisplayName,
+    reauth,
+    changePassword,
+    deleteAccount,
+  }
 }
 
 export { authReady }
