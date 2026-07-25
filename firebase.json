@@ -3,6 +3,7 @@
     "rules": "firestore.rules"
   },
   "hosting": {
+    "site": "vibecode-dailyplanner",
     "public": "dist",
     "ignore": [
       "firebase.json",
