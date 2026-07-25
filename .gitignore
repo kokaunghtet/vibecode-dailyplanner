@@ -24,3 +24,6 @@ Thumbs.db
 
 # Planning (GSD)
 .planning/
+
+# Firebase
+.firebase/
