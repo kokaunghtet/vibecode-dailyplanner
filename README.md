@@ -6,9 +6,20 @@ For anyone who wants a lightweight, no-frills daily to-do list with realtime syn
 
 ## Preview
 
+Live: https://vibecode-dailyplanner.web.app
+
 ![Login](screenshots/login.png)
 ![Today View](screenshots/today.png)
 ![Calendar View](screenshots/calendar.png)
+
+<details>
+<summary>Mobile</summary>
+
+![Login (mobile)](screenshots/login-mobile.png)
+![Today View (mobile)](screenshots/today-mobile.png)
+![Calendar View (mobile)](screenshots/calendar-mobile.png)
+
+</details>
 
 ## Features
 
