@@ -2,6 +2,7 @@
 import { watch, onUnmounted, ref } from 'vue'
 import TodoItem from './TodoItem.vue'
 import { useTodos } from '../composables/useTodos'
+import { useAuth } from '../composables/useAuth'
 import { formatDisplayDate } from '../utils/calendar'
 import { usePreferences } from '../composables/usePreferences'
 import { Sparkles, Loader2, Plus } from '@lucide/vue'
@@ -12,6 +13,7 @@ const props = defineProps<{
 
 const { dateFormat } = usePreferences()
 const { todos, loading, subscribeToDate, addTodo, toggleTodo, updateTodoText, deleteTodo, cleanup } = useTodos()
+const { user } = useAuth()
 
 const newTodoText = ref('')
 
@@ -21,6 +23,16 @@ watch(
     subscribeToDate(date)
   },
   { immediate: true }
+)
+
+// selectedDate often doesn't change across a logout/login (e.g. both land on
+// "today"), so the date watcher alone won't refire — watch the user too or
+// todos silently never (re)load after signing in.
+watch(
+  () => user.value?.uid,
+  () => {
+    subscribeToDate(props.selectedDate)
+  }
 )
 
 onUnmounted(() => {

@@ -24,6 +24,7 @@ vi.mock('./useAuth', () => ({
     user: { value: { uid: 'test-user-id' } },
     loading: { value: false },
   })),
+  authReady: Promise.resolve(),
 }))
 
 describe('useTodos', () => {
@@ -73,12 +74,52 @@ describe('useTodos', () => {
     vi.mocked(orderBy).mockReturnValue('orderByClause' as any)
 
     const { subscribeToDate } = useTodos()
-    subscribeToDate('2026-06-25')
+    await subscribeToDate('2026-06-25')
 
     expect(collection).toHaveBeenCalledWith({ type: 'firestore' }, 'users', 'test-user-id', 'todos')
     expect(where).toHaveBeenCalledWith('date', '==', '2026-06-25')
     expect(orderBy).toHaveBeenCalledWith('createdAt', 'asc')
     expect(onSnapshot).toHaveBeenCalled()
+  })
+
+  it('resubscribes when a different user logs in on the same date (regression: todos missing after re-login)', async () => {
+    const { onSnapshot, collection } = await import('firebase/firestore')
+    const { useAuth } = await import('./useAuth')
+    const { useTodos } = await import('./useTodos')
+
+    const unsubA = vi.fn()
+    const unsubB = vi.fn()
+    vi.mocked(onSnapshot).mockReturnValueOnce(unsubA).mockReturnValueOnce(unsubB)
+    vi.mocked(collection).mockReturnValue('todosRef' as any)
+
+    const mockedUseAuth = vi.mocked(useAuth)
+    mockedUseAuth.mockReturnValue({
+      user: { value: { uid: 'user-a' } },
+      loading: { value: false },
+    } as any)
+
+    const { subscribeToDate: subscribeAsUserA } = useTodos()
+    await subscribeAsUserA('2026-06-25')
+    expect(onSnapshot).toHaveBeenCalledTimes(1)
+
+    // same date, different (re-logged-in) user — must tear down A's listener
+    // and install a fresh one, not silently no-op.
+    mockedUseAuth.mockReturnValue({
+      user: { value: { uid: 'user-b' } },
+      loading: { value: false },
+    } as any)
+    const { subscribeToDate: subscribeAsUserB } = useTodos()
+    await subscribeAsUserB('2026-06-25')
+
+    expect(unsubA).toHaveBeenCalled()
+    expect(onSnapshot).toHaveBeenCalledTimes(2)
+    expect(collection).toHaveBeenLastCalledWith({ type: 'firestore' }, 'users', 'user-b', 'todos')
+
+    // restore default mock so later tests aren't affected by this override
+    mockedUseAuth.mockReturnValue({
+      user: { value: { uid: 'test-user-id' } },
+      loading: { value: false },
+    } as any)
   })
 
   it('addTodo calls addDoc with correct data', async () => {
@@ -155,7 +196,7 @@ describe('useTodos', () => {
     vi.mocked(onSnapshot).mockReturnValue(mockUnsubscribe)
 
     const { subscribeToDate, cleanup } = useTodos()
-    subscribeToDate('2026-06-25')
+    await subscribeToDate('2026-06-25')
     cleanup()
 
     expect(mockUnsubscribe).toHaveBeenCalled()

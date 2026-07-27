@@ -3,6 +3,7 @@ import {
   collection,
   query,
   where,
+  orderBy,
   onSnapshot,
   addDoc,
   updateDoc,
@@ -28,6 +29,7 @@ const loading = ref(false)
 const cache = new Map<string, Todo[]>()
 let unsubscribe: (() => void) | null = null
 let currentDate = ''
+let currentUid = ''
 
 export function useTodos() {
   const { user } = useAuth()
@@ -35,12 +37,32 @@ export function useTodos() {
   async function subscribeToDate(date: string) {
     await authReady
 
-    if (date === currentDate) return
+    const uid = user.value?.uid ?? ''
 
-    if (unsubscribe) unsubscribe()
-    if (!user.value) return
+    // Dedupe on both date AND uid — same date for a different user (e.g. after
+    // logout/login while a listener from the previous user is still active)
+    // must still resubscribe, otherwise stale/empty state sticks around.
+    if (date === currentDate && uid === currentUid) return
 
+    if (unsubscribe) {
+      unsubscribe()
+      unsubscribe = null
+    }
+    if (!user.value) {
+      currentDate = ''
+      currentUid = ''
+      return
+    }
+
+    // Cache is keyed by date only, not uid — clear it on a user switch so
+    // the new user never briefly sees the previous user's cached todos.
+    if (uid !== currentUid) cache.clear()
+
+    // Set guard state before the listener setup (not after) so a second call
+    // that lands while this one is still mid-setup sees the update and bails
+    // out instead of racing to install a second onSnapshot listener.
     currentDate = date
+    currentUid = uid
 
     if (cache.has(date)) {
       todos.value = cache.get(date)!
@@ -51,14 +73,13 @@ export function useTodos() {
     }
 
     const todosRef = collection(db, 'users', user.value.uid, 'todos')
-    const q = query(todosRef, where('date', '==', date))
+    const q = query(todosRef, where('date', '==', date), orderBy('createdAt', 'asc'))
 
+    const activeUid = uid
     unsubscribe = onSnapshot(q, (snapshot) => {
-      const result = snapshot.docs
-        .map((doc) => ({ id: doc.id, ...doc.data() }) as Todo)
-        .sort((a, b) => (a.createdAt?.seconds ?? 0) - (b.createdAt?.seconds ?? 0))
+      const result = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as Todo)
       cache.set(date, result)
-      if (currentDate === date) {
+      if (currentDate === date && currentUid === activeUid) {
         todos.value = result
         loading.value = false
       }
@@ -112,6 +133,7 @@ export function useTodos() {
       unsubscribe = null
     }
     currentDate = ''
+    currentUid = ''
     cache.clear()
     todos.value = []
     loading.value = false
