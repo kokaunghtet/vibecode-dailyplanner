@@ -48,7 +48,7 @@ Me — a student who juggles assignments, errands, and deadlines every day but s
 # Why it matters
 
 - **One place** for all daily tasks — no more scattered to-dos
-- **Calendar view** — see what's coming up and plan ahead
+- **Calendar view** — see what's coming up and plan ahead in calendar
 - **Per-user data** — secure, private task lists via Firebase Auth + Firestore
 - **Dark mode** — comfortable planning any time of day
 
