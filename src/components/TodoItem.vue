@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, nextTick } from 'vue'
+import { ref, computed, nextTick } from 'vue'
 import type { Todo } from '../composables/useTodos'
 import { X, Check } from '@lucide/vue'
 
@@ -12,6 +12,8 @@ const emit = defineEmits<{
   update: [todoId: string, text: string]
   delete: [todoId: string]
 }>()
+
+const editLabel = computed(() => `Edit task: ${props.todo.text}`)
 
 const isEditing = ref(false)
 const editValue = ref('')
@@ -61,16 +63,18 @@ function cancelEdit() {
       v-else
       ref="editInput"
       v-model="editValue"
+      :aria-label="editLabel"
       class="flex-1 text-sm border-b border-blue-500 outline-none bg-transparent text-gray-900 dark:text-white py-0.5"
       @keydown.enter="saveEdit"
       @keydown.escape="cancelEdit"
       @blur="saveEdit"
     />
 
-    <!-- Delete button -->
+    <!-- Delete button: always visible on touch (no hover state to reveal it on),
+         hidden-until-hover only kicks in at sm+ where a pointer is likely present -->
     <button
       type="button"
-      class="opacity-0 group-hover:opacity-100 transition-opacity text-red-600 dark:text-red-500 hover:text-red-800 dark:hover:text-red-400 p-1"
+      class="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:focus-visible:opacity-100 transition-opacity text-red-600 dark:text-red-500 hover:text-red-800 dark:hover:text-red-400 p-1"
       aria-label="Delete todo"
       @click="emit('delete', props.todo.id)"
     >

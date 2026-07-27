@@ -3,7 +3,6 @@ import {
   collection,
   query,
   where,
-  orderBy,
   onSnapshot,
   addDoc,
   updateDoc,
@@ -26,6 +25,7 @@ export interface Todo {
 
 const todos = ref<Todo[]>([])
 const loading = ref(false)
+const error = ref<string | null>(null)
 const cache = new Map<string, Todo[]>()
 let unsubscribe: (() => void) | null = null
 let currentDate = ''
@@ -64,6 +64,8 @@ export function useTodos() {
     currentDate = date
     currentUid = uid
 
+    error.value = null
+
     if (cache.has(date)) {
       todos.value = cache.get(date)!
       loading.value = false
@@ -73,20 +75,42 @@ export function useTodos() {
     }
 
     const todosRef = collection(db, 'users', user.value.uid, 'todos')
-    const q = query(todosRef, where('date', '==', date), orderBy('createdAt', 'asc'))
+    // Sorted client-side, not via a Firestore orderBy: where('date')+orderBy('createdAt')
+    // needs a composite index that isn't provisioned for this project (confirmed by
+    // FirebaseError: "query requires an index" when this was tried before).
+    const q = query(todosRef, where('date', '==', date))
 
     const activeUid = uid
     unsubscribe = onSnapshot(q, (snapshot) => {
-      const result = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as Todo)
+      const result = snapshot.docs
+        .map((doc) => ({ id: doc.id, ...doc.data() }) as Todo)
+        .sort((a, b) => (a.createdAt?.seconds ?? 0) - (b.createdAt?.seconds ?? 0))
       cache.set(date, result)
       if (currentDate === date && currentUid === activeUid) {
         todos.value = result
         loading.value = false
+        error.value = null
       }
     }, (err) => {
       console.error('Firestore query failed:', err)
-      loading.value = false
+      if (currentDate === date && currentUid === activeUid) {
+        loading.value = false
+        error.value = "Couldn't load your tasks. Check your connection and try again."
+      }
     })
+  }
+
+  // Forces a fresh subscription even if date/uid haven't changed — used by
+  // the UI's "Retry" action after a load failure, since subscribeToDate's
+  // normal dedupe guard would otherwise just no-op.
+  async function retry(date: string) {
+    if (unsubscribe) {
+      unsubscribe()
+      unsubscribe = null
+    }
+    currentDate = ''
+    currentUid = ''
+    await subscribeToDate(date)
   }
 
   async function addTodo(text: string, date: string) {
@@ -119,6 +143,35 @@ export function useTodos() {
     await deleteDoc(todoRef)
   }
 
+  const pendingDeleteTimers = new Map<string, ReturnType<typeof setTimeout>>()
+
+  // Soft-delete: hide immediately, commit the real delete after a grace
+  // window so the UI can offer "Undo" (feedback/ux-review.md #5 — delete
+  // was previously instant and irreversible).
+  function scheduleDelete(todoId: string, delayMs = 5000) {
+    const timer = setTimeout(() => {
+      pendingDeleteTimers.delete(todoId)
+      deleteTodo(todoId)
+    }, delayMs)
+    pendingDeleteTimers.set(todoId, timer)
+  }
+
+  function undoDelete(todoId: string) {
+    const timer = pendingDeleteTimers.get(todoId)
+    if (!timer) return false
+    clearTimeout(timer)
+    pendingDeleteTimers.delete(todoId)
+    return true
+  }
+
+  function commitPendingDeletes() {
+    for (const [todoId, timer] of pendingDeleteTimers) {
+      clearTimeout(timer)
+      deleteTodo(todoId)
+    }
+    pendingDeleteTimers.clear()
+  }
+
   async function getAllTodos(): Promise<Todo[]> {
     await authReady
     if (!user.value) return []
@@ -132,12 +185,28 @@ export function useTodos() {
       unsubscribe()
       unsubscribe = null
     }
+    commitPendingDeletes()
     currentDate = ''
     currentUid = ''
     cache.clear()
     todos.value = []
     loading.value = false
+    error.value = null
   }
 
-  return { todos, loading, subscribeToDate, addTodo, toggleTodo, updateTodoText, deleteTodo, getAllTodos, cleanup }
+  return {
+    todos,
+    loading,
+    error,
+    subscribeToDate,
+    retry,
+    addTodo,
+    toggleTodo,
+    updateTodoText,
+    deleteTodo,
+    scheduleDelete,
+    undoDelete,
+    getAllTodos,
+    cleanup,
+  }
 }

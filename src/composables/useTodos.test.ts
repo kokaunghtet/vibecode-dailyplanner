@@ -5,7 +5,6 @@ vi.mock('firebase/firestore', () => ({
   collection: vi.fn(),
   query: vi.fn(),
   where: vi.fn(),
-  orderBy: vi.fn(),
   onSnapshot: vi.fn(),
   addDoc: vi.fn(),
   updateDoc: vi.fn(),
@@ -63,7 +62,7 @@ describe('useTodos', () => {
   })
 
   it('subscribeToDate calls onSnapshot with correct query', async () => {
-    const { onSnapshot, collection, query, where, orderBy } = await import('firebase/firestore')
+    const { onSnapshot, collection, query, where } = await import('firebase/firestore')
     const { useTodos } = await import('./useTodos')
 
     const mockUnsubscribe = vi.fn()
@@ -71,14 +70,12 @@ describe('useTodos', () => {
     vi.mocked(collection).mockReturnValue('todosRef' as any)
     vi.mocked(query).mockReturnValue('queryRef' as any)
     vi.mocked(where).mockReturnValue('whereClause' as any)
-    vi.mocked(orderBy).mockReturnValue('orderByClause' as any)
 
     const { subscribeToDate } = useTodos()
     await subscribeToDate('2026-06-25')
 
     expect(collection).toHaveBeenCalledWith({ type: 'firestore' }, 'users', 'test-user-id', 'todos')
     expect(where).toHaveBeenCalledWith('date', '==', '2026-06-25')
-    expect(orderBy).toHaveBeenCalledWith('createdAt', 'asc')
     expect(onSnapshot).toHaveBeenCalled()
   })
 
