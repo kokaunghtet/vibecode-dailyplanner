@@ -43,6 +43,23 @@ const router = createRouter({
   routes
 })
 
+declare global {
+  interface Window {
+    goatcounter?: { count: (opts?: { path?: string }) => void }
+  }
+}
+
+// The count.js script's own onload handler tracks the first pageview;
+// only fire manually for subsequent client-side route changes.
+let isFirstNav = true
+router.afterEach((to) => {
+  if (isFirstNav) {
+    isFirstNav = false
+    return
+  }
+  window.goatcounter?.count({ path: to.fullPath })
+})
+
 router.beforeEach(async (to) => {
   await authReady
 
