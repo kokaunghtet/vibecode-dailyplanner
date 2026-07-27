@@ -2,6 +2,8 @@
 
 A personal productivity app built with Vue 3 and Firebase. Plan your day, manage tasks by date, and track progress across a calendar view. Built as part of the Vibe Code Tour Chapter 3 personal project.
 
+For anyone who wants a lightweight, no-frills daily to-do list with realtime sync across devices — no project boards, tags, or reminders, just tasks scoped to a date.
+
 ## Preview
 
 ![Login](screenshots/login.png)
@@ -38,6 +40,7 @@ src/
 │   ├── CalendarGrid.vue      # Monthly calendar
 │   ├── DayCell.vue           # Single day in calendar
 │   ├── NotificationPrompt.vue
+│   ├── ReauthModal.vue       # Re-auth prompt for sensitive actions
 │   ├── ThemeToggle.vue
 │   ├── TodoItem.vue          # Single task row
 │   └── TodoPanel.vue         # Task list + add input
@@ -45,13 +48,20 @@ src/
 │   ├── LoginView.vue
 │   ├── TodayView.vue         # Today's tasks
 │   ├── CalendarView.vue      # Calendar + selected day tasks
-│   └── DashboardView.vue
+│   ├── DashboardView.vue
+│   ├── ProfileView.vue
+│   └── SettingsView.vue
 ├── composables/
 │   ├── useAuth.ts            # Firebase Auth state
 │   ├── useTodos.ts           # Firestore CRUD + real-time sync
-│   └── useNotifications.ts
+│   ├── useNotifications.ts
+│   ├── usePreferences.ts     # Date format, landing route, etc.
+│   └── useTheme.ts           # Dark/light mode state
 ├── router/index.ts
 └── firebase.ts
+
+functions/                     # Independent TS project (Cloud Functions)
+└── src/index.ts
 ```
 
 ## Getting Started
@@ -67,8 +77,11 @@ cp .env.example .env
 # Start dev server
 npm run dev
 
-# Run tests
+# Run unit tests
 npm test
+
+# Run e2e tests (needs a running dev server + .env.e2e.local with E2E_EMAIL/E2E_PASSWORD)
+npm run test:e2e
 
 # Deploy
 npm run build && firebase deploy --only hosting
@@ -97,6 +110,8 @@ This project uses Claude Code with custom configuration for AI-assisted developm
 | `@modelcontextprotocol/server-filesystem` | Read/write project files directly        |
 | `@modelcontextprotocol/server-memory`     | Persist context across Claude sessions   |
 | `@upstash/context7-mcp`                   | Fetch live docs for libraries/frameworks |
+| `chrome-devtools-mcp`                     | Inspect running app, console, responsiveness |
+| `@playwright/mcp`                         | Browser automation for e2e testing       |
 
 ### Skills (`.claude/skills/`)
 
